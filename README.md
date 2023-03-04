@@ -15,7 +15,7 @@ Open the `in.json` file in the root folder and change it to your B+ Tree array, 
 
 ## Execution:
 
-open the terminal and enter the following command:
+Open the terminal and enter the following command:
 
 ```shell
 python draw.py <INPUT_FILE> -o <OUTPUT_FILE>
