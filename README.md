@@ -27,4 +27,4 @@ where `<INPUT_FILE>` is the json file containing the B+ Tree array and `<OUTPUT_
 python draw.py in.json -o out.png
 ```
 
-will generate the image using data stored in `in.json` and save the image in `out.png`.
+will generate the image using data stored in `in.json` and save the image in `out.png`. Note that if you are using a Windows system then you should replace `python` with `python3`.
