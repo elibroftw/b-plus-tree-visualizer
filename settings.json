@@ -1,0 +1,16 @@
+{
+    "d": 2,
+    "split-rule": "left",
+    "merge-rule": "maximum",
+
+    "node-name": "B{}",
+    "block-width": 60,
+    "block-height": 35,
+
+    "margin": 30,
+    "horizontal-separation": 60,
+    "vertical-separation": 150,
+
+    "font-family": "fonts/arial.ttf",
+    "font-size": 20
+}
