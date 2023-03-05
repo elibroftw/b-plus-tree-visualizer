@@ -102,7 +102,10 @@ class TreeVisualizer:
         # Draw the data
         for (i, data) in enumerate(node.data_arr):
             center = pos + self.bl_size * Vec2(i + 0.5, 1.5)
-            canvas.text(center.as_tuple(), str(data), anchor="mm", font=self.font, fill=0x000000)
+            if isinstance(data, list):
+                canvas.text(center.as_tuple(), str(data[0]), anchor="mm", font=self.font, fill=data[1])
+            else:
+                canvas.text(center.as_tuple(), str(data), anchor="mm", font=self.font, fill=0x000000)
 
         # Draw connection to parent
         if connect_to_parent and node.parent is not None:
