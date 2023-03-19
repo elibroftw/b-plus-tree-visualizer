@@ -1,19 +1,24 @@
 # B+ Tree Visualizer
- This python script draws graphs of B+ Trees.
 
-## Environment:
+This python script draws graphs of B+ Trees.
 
-Python 3.10+, pillow 9+
+## Environment
 
-## Settings:
+Python 3.10+, Pillow 9+
 
-Open the `settings.json` file in the root folder to change the configurations. The meaning of each of them is straight forward, so I will not explain it here.
+`pip install -r requirements.txt`
 
-## Enter data:
+## Settings
+
+Open the `settings.json` file in the root folder to change the configurations
+
+`d`: The degree/order/fanout of each node.
+
+## Enter data
 
 Open the `in.json` file in the root folder and change it to your B+ Tree array, or you can put it in any other file.
 
-## Execution:
+## Execution
 
 Open the terminal and enter the following command:
 

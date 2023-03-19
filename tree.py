@@ -39,10 +39,9 @@ class Node:
         """
         return len(self.children) >= len(self.data_arr) + 1
 
-    def __str__(self) -> str:
-        return f"<{self.name}{'' if self.parent is None else f'({self.parent.name})'}: {self.data_arr}, " \
-               f"{[c.name for c in self.children]}>"
-    __repr__ = __str__
+    def __repr__(self) -> str:
+        parent = '' if self.parent is None else f'({self.parent.name})'
+        return f'<{self.name} {parent}: {self.data_arr}, {[c.name for c in self.children]}>'
 
 
 class Tree:
@@ -66,7 +65,7 @@ class Tree:
             new_level = []
 
             for data_arr in level:
-                name = settings["node-name"].format(self.enumi)
+                name = settings['node-name'].format(self.enumi)
                 self.enumi += 1
                 while i < len(self.nodes[-1]) and self.nodes[-1][i].is_full():
                     i += 1
@@ -108,13 +107,12 @@ class Tree:
         """
         return None if len(self.nodes) == 0 else self.nodes[0][0]
 
-    def __str__(self) -> str:
-        string = ""
+    def __repr__(self) -> str:
+        string = ''
         for level in self.nodes:
             for (i, node) in enumerate(level):
                 if i > 0:
-                    string += "  "
+                    string += '  '
                 string += str(node)
-            string += "\n"
+            string += '\n'
         return string
-    __repr__ = __str__

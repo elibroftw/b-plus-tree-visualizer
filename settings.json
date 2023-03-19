@@ -1,9 +1,10 @@
 {
-    "d": 2,
+    "d": 4,
     "split-rule": "left",
     "merge-rule": "maximum",
 
     "node-name": "B{}",
+    "show-name": false,
     "block-width": 60,
     "block-height": 35,
 
