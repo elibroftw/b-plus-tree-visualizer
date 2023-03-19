@@ -2,11 +2,51 @@ from __future__ import annotations
 from argparse import ArgumentParser
 import json
 from itertools import chain
+import math
 
 from load_settings import settings
 from tree import *
 
 from PIL import Image, ImageDraw, ImageFont
+
+
+def arrowedLine(canvas, ptA: Vec2, ptB: Vec2, width=1, color=settings['color']):
+    """Draw line from ptA to ptB with arrowhead at ptB"""
+    # Get drawing context
+    # Draw the line without arrows
+    canvas.line(flatten_vectors(ptA, ptB), width=width, fill=color)
+
+    # Now work out the arrowhead
+    # = it will be a triangle with one vertex at ptB
+    # - it will start at 95% of the length of the line
+    # - it will extend 8 pixels either side of the line
+    x0, y0 = ptA
+    x1, y1 = ptB
+    # Now we can work out the x,y coordinates of the bottom of the arrowhead triangle
+    xb = 0.95*(x1-x0)+x0
+    yb = 0.95*(y1-y0)+y0
+
+    # Work out the other two vertices of the triangle
+    # Check if line is vertical
+    if x0==x1:
+       vtx0 = (xb-5, yb)
+       vtx1 = (xb+5, yb)
+    # Check if line is horizontal
+    elif y0==y1:
+       vtx0 = (xb, yb+5)
+       vtx1 = (xb, yb-5)
+    else:
+       alpha = math.atan2(y1-y0,x1-x0)-90*math.pi/180
+       a = 8*math.cos(alpha)
+       b = 8*math.sin(alpha)
+       vtx0 = (xb+a, yb+b)
+       vtx1 = (xb-a, yb-b)
+
+    #draw.point((xb,yb), fill=(255,0,0))    # DEBUG: draw point of base in red - comment out draw.polygon() below if using this line
+    #im.save('DEBUG-base.png')              # DEBUG: save
+
+    # Now draw the arrowhead triangle
+    canvas.polygon([vtx0, vtx1, ptB.as_tuple()], fill=color)
 
 
 class Vec2:
@@ -17,7 +57,6 @@ class Vec2:
         :param x: X component of the vector (horizontal distance to the left edge in pixels)
         :param y: Y component of the vector (vertical distance to the top edge in pixels)
         """
-
         self.x = x
         self.y = y
 
@@ -26,6 +65,9 @@ class Vec2:
         :return: A tuple containing x and y values
         """
         return self.x, self.y
+
+    def __iter__(self):
+        return iter((self.x, self.y))
 
     def clone(self) -> Vec2:
         """Return a new vector with exactly the same data.
@@ -105,18 +147,18 @@ class TreeVisualizer:
 
         # Draw the name
         if settings['show-name']:
-            canvas.rectangle(flatten_vectors(pos, pos + self.bl_size * Vec2(self.n, 1)), outline=0x000000)
+            canvas.rectangle(flatten_vectors(pos, pos + self.bl_size * Vec2(self.n, 1)), outline=settings['color'])
             center = pos + self.bl_size * Vec2(self.n, 1) * 0.5
-            canvas.text(center.as_tuple(), node.name, anchor='mm', font=self.font, fill=0x000000)
+            canvas.text(center.as_tuple(), node.name, anchor='mm', font=self.font, fill=settings['color'])
 
         # draw row
         top_left = pos - (10, 0)
         bot_right = pos + self.ch_size * Vec2(self.n, start_row + 1) - (10, 0)
-        canvas.rectangle(flatten_vectors(top_left, bot_right), outline=0x000000)
+        canvas.rectangle(flatten_vectors(top_left, bot_right), outline=settings['color'])
         # draw separators
         for i in range(self.n):
             upper_left = top_left + self.bl_size * Vec2(i, start_row)
-            canvas.rectangle(flatten_vectors(upper_left, upper_left + (10, self.bl_size.y)), outline=0x000000)
+            canvas.rectangle(flatten_vectors(upper_left, upper_left + (10, self.bl_size.y)), outline=settings['color'])
 
         # Draw the data
         for (i, data) in enumerate(node.data_arr):
@@ -124,18 +166,19 @@ class TreeVisualizer:
             if isinstance(data, list):
                 canvas.text(center.as_tuple(), str(data[0]), anchor='mm', font=self.font, fill=data[1])
             else:
-                canvas.text(center.as_tuple(), str(data), anchor='mm', font=self.font, fill=0x000000)
+                canvas.text(center.as_tuple(), str(data), anchor='mm', font=self.font, fill=settings['color'])
 
         # Draw connections or lines to parent
         if connect_to_parent and node.parent is not None:
-            start = pos + self.bl_size * Vec2(len(node.data_arr) / 2, 0)
-            end = self.positions[node.parent.name] + self.bl_size * Vec2(node.parent.children.index(node) + 0.5, 3 - (2 - start_row)) - (self.bl_size.x - 22.5, 0)
-            canvas.line(flatten_vectors(start, end), fill=0x000000, width=1)
+            child_top = pos + self.bl_size * Vec2(len(node.data_arr) / 2, 0)
+            parent_sep = self.positions[node.parent.name] + self.bl_size * Vec2(node.parent.children.index(node) + 0.5, 3 - (2 - start_row)) - (self.bl_size.x - 24, 0)
+            arrowedLine(canvas, parent_sep, child_top)
 
         if connect_to_right and node in self.tree.nodes[-1][:-1]:
-            start = pos + self.ch_size * Vec2(self.n, 2.5 - (2 - start_row)) - (10, 0)
-            end = start + self.separation * Vec2(1.8, 0)
-            canvas.line(flatten_vectors(start, end), fill=0x000000, width=1)
+            child_end = pos + self.ch_size * Vec2(self.n, 2.5 - (2 - start_row)) - (10, 0)
+            sibling_start = child_end + self.separation * Vec2(1.7, 0)
+            arrowedLine(canvas, child_end, sibling_start)
+            # canvas.line(flatten_vectors(start, end), fill=settings['color'], width=1)
 
     def _draw_tree(self, canvas: ImageDraw) -> None:
         """Draw the entire tree using the information in `self.positions`.
@@ -172,7 +215,7 @@ class TreeVisualizer:
         """
         self.analyze_tree()
         print(self.dimensions)
-        with Image.new('RGB', self.dimensions.as_tuple(), 0xffffff) as image:
+        with Image.new('RGB', self.dimensions.as_tuple(), settings['background']) as image:
             canvas = ImageDraw.Draw(image)
             self._draw_tree(canvas)
             image.save(path, 'PNG')

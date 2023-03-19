@@ -2,6 +2,8 @@
     "d": 4,
     "split-rule": "left",
     "merge-rule": "maximum",
+    "color": "#2094FF",
+    "background": "#121212",
 
     "node-name": "B{}",
     "show-name": false,
