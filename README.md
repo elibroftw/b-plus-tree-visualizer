@@ -1,10 +1,10 @@
 # B+ Tree Visualizer
 
-This python script draws graphs of B+ Trees.
+This python script can draw B+ Trees with some customization.
 
 ## Environment
 
-Python 3.10+, Pillow 9+
+Python 3.8+
 
 `pip install -r requirements.txt`
 
@@ -12,7 +12,9 @@ Python 3.10+, Pillow 9+
 
 Open the `settings.json` file in the root folder to change the configurations
 
-`d`: The degree/order/fanout of each node.
+- `d`: The fanout of each node (fanout = max degree - 1)
+- `color`: color of foreground (e.g. arrows, boxes)
+- `background`: background color of output image
 
 ## Enter data
 
@@ -20,16 +22,9 @@ Open the `in.json` file in the root folder and change it to your B+ Tree array, 
 
 ## Execution
 
-Open the terminal and enter the following command:
-
 ```shell
-python draw.py <INPUT_FILE> -o <OUTPUT_FILE>
+python draw.py --input=in.json -o=out.png
 ```
 
-where `<INPUT_FILE>` is the json file containing the B+ Tree array and `<OUTPUT_FILE>` is the output PNG file. For example,
-
-```shell
-python draw.py in.json -o out.png
-```
-
-will generate the image using data stored in `in.json` and save the image in `out.png`. Note that if you are using a Windows system then you should replace `python` with `python3`.
+This will generate the image using data stored in `in.json` and save the image in
+`out.png`. Note that if you have Python2 installed, you should use `python3` rather than `python`
